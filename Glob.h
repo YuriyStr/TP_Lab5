@@ -1,4 +1,3 @@
-
 #ifndef _GLOBH_DEFINED_
 #define _GLOBH_DEFINED_
 #include <stdio.h>
@@ -6,13 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #define NO_USER 0
 #define ADMIN 1
 #define OPER 2
 #define CLIENT 3
 
-	extern sqlite3 *db;
+extern sqlite3 *db;
 extern sqlite3_stmt *res;
 extern int rc;
 extern int currUser;
@@ -52,14 +52,13 @@ void checkConfig();
 void sendAdminQuery(int code);
 void sendOperQuery();
 
-void credit(char *passportNo, char *cardNo, double money);
-void debit(char *passportNo, char *cardNo, double money);
-void transfer(char *passportNo, char *cardNoFrom, char *cardNoTo, double money);
-void checkBalance(char *passportNo, char *cardNo);
+int credit(char *passportNo, char *cardNo, double money);
+int debit (char *passportNo, char *cardNo, double money);
+int transfer(char *passportNo, char *cardNoFrom, char *cardNoTo, double money);
+void checkBalance();
 
-extern void(*adminQueries[])();
-extern void(*adminQueriesFromBase[])(int);
-extern void(*operQueries[])(char*, char*, double);
+extern void (* adminQueriesFromBase[])(int);
+
 
 int callbackQueries(void *data, int argc, char **argv, char **azColName);
 #endif // _GLOBH_DEFINED_
