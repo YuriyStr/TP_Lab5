@@ -57,6 +57,9 @@ void performPreparations()
         int id = sqlite3_column_int(res, 0);
         double balance = sqlite3_column_double(res, 1);
         char *currOverdraft = (char*)sqlite3_column_text(res, 2);
+        
+        printf ("%d %f %s %f\n", id, balance, currOverdraft, debt);
+        
         if (currOverdraft != NULL)
         {
             struct tm *overdraftTerm = malloc(sizeof(struct tm));
@@ -107,19 +110,22 @@ void performPreparations()
         else if (balance < 0)
         {
             sqlite3_stmt *pStmt;
-            char *sel = "SELECT OverdraftTermDays, OverdraftMax From BANK_CONFIG Where Account_Type = ?";
+            char *sel = "SELECT OverdraftTermDays From BANK_CONFIG Where Account_Type = ?";
             rc = sqlite3_prepare_v2(db, sel, -1, &pStmt, 0);
-            sqlite3_bind_text(res, 1, "Overdraft", -1, SQLITE_TRANSIENT);
-            sqlite3_step(res);
+            sqlite3_bind_text(pStmt, 1, "Overdraft", -1, SQLITE_TRANSIENT);
+            sqlite3_step(pStmt);
             int days = sqlite3_column_int(pStmt, 0);
-            double overdraftMax = sqlite3_column_double(pStmt, 1);
+            
+            printf("%d\n", days);
+            //double overdraftMax = sqlite3_column_double(pStmt, 1);
             
             char end[20];
             sprintf (end, "%d-%d-%d", currentTimeInfo->tm_year + 1900, currentTimeInfo->tm_mon + 1, currentTimeInfo->tm_mday + days);
             sel = "UPDATE BANK_ACCOUNTS set OverdraftEnd = @end Where ID = @id";
             rc = sqlite3_prepare_v2(db, sel, -1, &pStmt, 0);
             idx = sqlite3_bind_parameter_index(pStmt, "@end");
-            sqlite3_bind_text(res, idx, end, -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(pStmt, idx, end, -1, SQLITE_TRANSIENT);
+            
             idx = sqlite3_bind_parameter_index(pStmt, "@id");
             sqlite3_bind_int(pStmt, idx, id);
             sqlite3_step(pStmt);
